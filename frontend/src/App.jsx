@@ -27,7 +27,6 @@ function App() {
     }
   }, []);
 
-
   const exchangeCodeForToken = (code) => {
     if (code) {
       setLoading(true);
@@ -50,34 +49,6 @@ function App() {
         });
     }
   };
-
-
-
-
-
-  // const exchangeCodeForToken = async (code) => {
-  //   try {
-  //     setLoading(true)
-  //     const response = await fetch(`http://localhost:5000/api/callback?code=${code}`);
-  //     const { access_token } = await response.json();
-
-  //     if (access_token) {
-  //       setIsAuthenticated(true);
-  //       setToken(access_token)
-  //       localStorage.setItem('token', access_token);
-  //     } else {
-  //       console.error('Failed to exchange code for token:', access_token);
-  //       setLoading(false)
-  //     }
-  //   } catch (error) {
-  //     console.error('Error exchanging code for token:', error);
-  //     setLoading(false)
-  //   }
-  // };
-
-
-
-
 
 
   const LoadingScreen = () => {
