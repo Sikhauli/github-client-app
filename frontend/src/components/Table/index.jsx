@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from 'axios';
 import {
     Table,
     TableHeader,
@@ -17,35 +18,38 @@ import {
     Pagination,
 } from "@nextui-org/react";
 import { capitalize } from "./utils";
-import { columns, users, statusOptions } from "./data";
-import { FaPlus } from "react-icons/fa6";
+import { columns, statusOptions } from "./data";
 import { IoEllipsisVerticalSharp } from "react-icons/io5";
 import { CiSearch } from "react-icons/ci";
+import { useSnackbar } from "notistack";
 
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
 const statusColorMap = {
-    active: "success",
-    paused: "danger",
-    vacation: "warning",
+    later: "success",
+    read: "danger",
 };
 
+const INITIAL_VISIBLE_COLUMNS = ["id", "message",  "status", "actions"];
 
-const INITIAL_VISIBLE_COLUMNS = ["name", "role", "status", "actions"];
+export default function App({ repoData, token, setLoading }) {
 
-export default function App() {
     const [filterValue, setFilterValue] = React.useState("");
     const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
     const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
     const [statusFilter, setStatusFilter] = React.useState("all");
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const [sortDescriptor, setSortDescriptor] = React.useState({
-        column: "age",
+        column: "date",
         direction: "ascending",
     });
     const [page, setPage] = React.useState(1);
+    const { enqueueSnackbar } = useSnackbar();
 
-    const pages = Math.ceil(users.length / rowsPerPage);
+    const [commits, setCommits] = useState([]);
+    const [commitData, setCommitData] = useState([]);
+
+    const pages = Math.ceil(commits?.length / rowsPerPage);
 
     const hasSearchFilter = Boolean(filterValue);
 
@@ -56,11 +60,12 @@ export default function App() {
     }, [visibleColumns]);
 
     const filteredItems = React.useMemo(() => {
-        let filteredUsers = [...users];
+        let filteredUsers = [...commits];
 
         if (hasSearchFilter) {
             filteredUsers = filteredUsers.filter((user) =>
-                user.name.toLowerCase().includes(filterValue.toLowerCase()),
+                user.message.toLowerCase().includes(filterValue.toLowerCase()) ||
+                user.id.toLowerCase().includes(filterValue.toLowerCase())
             );
         }
         if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
@@ -70,7 +75,7 @@ export default function App() {
         }
 
         return filteredUsers;
-    }, [users, filterValue, statusFilter]);
+    }, [commits, filterValue, statusFilter]);
 
     const items = React.useMemo(() => {
         const start = (page - 1) * rowsPerPage;
@@ -89,39 +94,91 @@ export default function App() {
         });
     }, [sortDescriptor, items]);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                // Fetch commit data from GitHub API
+                const githubResponse = await axios.get(`${repoData?.commits_url?.replace('{/sha}', '')}`, {
+                    headers: {
+                        Authorization: `token ${token}`,
+                    },
+                });
+                const commitsData = githubResponse.data.map(commit => ({
+                    message: commit.commit.message,
+                    date: commit.commit.author.date,
+                    id: commit.sha,
+                    status: "",
+                }));
+
+                // Set the commit data state
+                setCommitData(commitsData);
+
+                // Fetch commits from server if repoData 
+                if (repoData) {
+                    const serverResponse = await axios.get('http://localhost:5000/api/commits/all', {
+                        params: {
+                            name: repoData?.name
+                        }
+                    });
+                    const mergedArray = mergeArrays(serverResponse.data, commitsData);
+                    setCommits(mergedArray);
+                } else {
+                    setCommits(commitsData);
+                }
+            } catch (error) {
+                console.error(error);
+                enqueueSnackbar(error, { variant: "error" });
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [token, enqueueSnackbar, repoData, setLoading]);
+
+    const mergeArrays = (array1, array2) => {
+        return array2.reduce((acc, obj2) => {
+            const obj1 = array1.find(obj1 => obj1.id === obj2.id);
+            if (!obj1) {
+                acc.push(obj2);
+            }
+            return acc;
+        }, [...array1]);
+    };
+
+    // Function to update the status of a commit
+    const handleUpdateStatus = React.useCallback(async (commitId, newStatus, message) => {
+        try {
+            const requestBody = {
+                status: newStatus,
+                id: commitId,
+                message,
+                name: repoData?.name
+            };
+            const response = await axios.post(`http://localhost:5000/api/commits/status`, requestBody);
+            enqueueSnackbar(`Successfully updated status to ${response.data.status === 'read' ? 'Read' : 'Read Later'}`, {
+                variant: "success",
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error updating commit status:', error);
+            throw error;
+        }
+    }, [enqueueSnackbar]);
+
     const renderCell = React.useCallback((user, columnKey) => {
         const cellValue = user[columnKey];
-
-        switch (columnKey) {
-            case "name":
-                return (
-                    <User
-                        avatarProps={{ radius: "full", size: "sm", src: user.avatar }}
-                        classNames={{
-                            description: "text-default-500",
-                        }}
-                        description={user.email}
-                        name={cellValue}
-                    >
-                        {user.email}
-                    </User>
-                );
-            case "role":
-                return (
-                    <div className="flex flex-col">
-                        <p className="text-bold text-small capitalize">{cellValue}</p>
-                        <p className="text-bold text-tiny capitalize text-default-500">{user.team}</p>
-                    </div>
-                );
+        switch (columnKey) {           
             case "status":
                 return (
                     <Chip
-                        className="capitalize border-none gap-1 text-default-600"
-                        color={statusColorMap[user.status]}
+                        className="capitalize border-none gap-1 text-default-600 rounded"
+                        color={statusColorMap[user.status] || ''}
                         size="sm"
                         variant="dot"
                     >
-                        {cellValue}
+                        {cellValue || 'None'}
                     </Chip>
                 );
             case "actions":
@@ -134,9 +191,8 @@ export default function App() {
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu>
-                                <DropdownItem>View</DropdownItem>
-                                <DropdownItem>Edit</DropdownItem>
-                                <DropdownItem>Delete</DropdownItem>
+                                <DropdownItem onClick={() => handleUpdateStatus(user.id, 'read', user.message)}>Read</DropdownItem>
+                                <DropdownItem onClick={() => handleUpdateStatus(user.id, 'later', user.message)}>Later</DropdownItem>
                             </DropdownMenu>
                         </Dropdown>
                     </div>
@@ -150,7 +206,6 @@ export default function App() {
         setRowsPerPage(Number(e.target.value));
         setPage(1);
     }, []);
-
 
     const onSearchChange = React.useCallback((value) => {
         if (value) {
@@ -233,7 +288,7 @@ export default function App() {
                     </div>
                 </div>
                 <div className="flex justify-between items-center">
-                    <span className="text-default-400 text-small">Total {users.length} users</span>
+                    <span className="text-default-400 text-small">Total {commits?.length} commits</span>
                     <label className="flex items-center text-default-400 text-small">
                         Rows per page:
                         <select
@@ -254,7 +309,7 @@ export default function App() {
         visibleColumns,
         onSearchChange,
         onRowsPerPageChange,
-        users.length,
+        commits?.length,
         hasSearchFilter,
     ]);
 
@@ -333,7 +388,7 @@ export default function App() {
                     </TableColumn>
                 )}
             </TableHeader>
-            <TableBody emptyContent={"No users found"} items={sortedItems}>
+            <TableBody emptyContent={"No data was found"} items={sortedItems}>
                 {(item) => (
                     <TableRow key={item.id}>
                         {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
