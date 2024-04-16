@@ -1,8 +1,10 @@
-# SneakerShop
+# Github-Client-app
+
 
 ### Weblink: [Live Website](https://github-client-app.onrender.com)
 ## Image:
-<img width="450px;" src="https://github.com/Sikhauli/SneakerShop/blob/main/src/assets/img/1.png?raw=true"/>
+<img width="450px;" src="https://github.com/Sikhauli/github-client-app/blob/main/frontend/src/assets/11.png?raw=true"/>
+<img width="450px;" src="https://github.com/Sikhauli/github-client-app/blob/main/frontend/src/assets/10.png?raw=true"/>
 
 ## Table of Contents
 - [Introduction](#introduction)
