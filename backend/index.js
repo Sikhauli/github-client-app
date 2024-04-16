@@ -15,7 +15,7 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
-const clientWebsite = "https://github-client-app.onrender.com";
+const clientWebsite = process.env.CLIENT_WEBSITE || "https://github-client-app.onrender.com";
 
 //connect to DB
 //listen after db connection has been est

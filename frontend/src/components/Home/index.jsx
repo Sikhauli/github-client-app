@@ -87,7 +87,7 @@ function index({ token, setLoading }) {
         setLoading(true)
         axios.get(`${API_URL}repo`, {
             headers: {
-                token: token,
+                // token: token,
             },
         })
             .then((response) => {

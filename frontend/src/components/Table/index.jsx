@@ -108,7 +108,7 @@ export default function App({ repoData, token, setLoading }) {
                 // Fetch commit data from GitHub API
                 const githubResponse = await axios.get(`${repoData?.commits_url?.replace('{/sha}', '')}`, {
                     headers: {
-                        Authorization: `token ${token}`,
+                     Authorization: `token ${token}`,
                     },
                 });
                 const commitsData = githubResponse.data.map(commit => ({
