@@ -66,7 +66,7 @@ function index({ token, setLoading }) {
 
     useEffect(() => {
         setLoading(true)
-        axios.get(`https://api.github.com/user/repos`, {
+        axios.get('https://api.github.com/user/repos?type=public', {
             headers: {
                 Authorization: `token ${token}`,
             },
@@ -87,7 +87,7 @@ function index({ token, setLoading }) {
         setLoading(true)
         axios.get(`${API_URL}repo`, {
             headers: {
-                // token: token,
+                token: token,
             },
         })
             .then((response) => {
