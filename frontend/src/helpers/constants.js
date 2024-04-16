@@ -1,7 +1,7 @@
 // icons imports
 import axios from "axios";
 
-export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api/";
+export const API_URL = import.meta.env.VITE_API_URL || "https://github-client-app-api.onrender.com/api/";
 
 export const API = axios.create({
     baseURL: API_URL,
@@ -10,9 +10,9 @@ export const API = axios.create({
 
 
 export const CALLBACK_ENDPOINTS = {
-   
-};
+    get: "callback",
 
+};
 
 export const getAxiosError = (error) => {
     if (error.response) {

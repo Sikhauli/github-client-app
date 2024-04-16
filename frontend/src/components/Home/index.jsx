@@ -12,6 +12,14 @@ import { IoMdArrowRoundBack } from "react-icons/io";
 import CardListWithPagination from '../../components/Card/index';
 import { useSnackbar } from "notistack";
 
+import {
+    API,
+    API_URL,
+    CALLBACK_ENDPOINTS,
+    getAxiosError,
+
+} from "../../helpers/constants"
+
 // components
 import Table from "../Table"
 
@@ -77,7 +85,7 @@ function index({ token, setLoading }) {
 
     useEffect(() => {
         setLoading(true)
-        axios.get(`http://localhost:5000/api/repo`, {
+        axios.get(`${API_URL}repo`, {
             headers: {
                 token: token,
             },

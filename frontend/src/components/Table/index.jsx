@@ -22,6 +22,13 @@ import { columns, statusOptions } from "./data";
 import { IoEllipsisVerticalSharp } from "react-icons/io5";
 import { CiSearch } from "react-icons/ci";
 import { useSnackbar } from "notistack";
+import {
+    API,
+    API_URL,
+    CALLBACK_ENDPOINTS,
+    getAxiosError,
+
+} from "../../helpers/constants"
 
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
@@ -116,7 +123,7 @@ export default function App({ repoData, token, setLoading }) {
 
                 // Fetch commits from server if repoData 
                 if (repoData) {
-                    const serverResponse = await axios.get('http://localhost:5000/api/commits/all', {
+                    const serverResponse = await axios.get('${API_URL}commits/all', {
                         params: {
                             name: repoData?.name
                         }
@@ -156,7 +163,7 @@ export default function App({ repoData, token, setLoading }) {
                 message,
                 name: repoData?.name
             };
-            const response = await axios.post(`http://localhost:5000/api/commits/status`, requestBody);
+            const response = await axios.post(`${API_URL}commits/status`, requestBody);
             enqueueSnackbar(`Successfully updated status to ${response.data.status === 'read' ? 'Read' : 'Read Later'}`, {
                 variant: "success",
             });

@@ -5,14 +5,17 @@ import { Circles } from 'react-loading-icons';
 import Home from './pages/Home/index';
 import Login from './pages/Login/index';
 import {
-  API_URL,
-  API
+  API, 
+  CALLBACK_ENDPOINTS,
+  getAxiosError
 } from "./helpers/constants"
+import { useSnackbar } from "notistack";
 
 function App() {
   const [loading, setLoading] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState()
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -24,25 +27,58 @@ function App() {
     }
   }, []);
 
-  const exchangeCodeForToken = async (code) => {
-    try {
-      setLoading(true)
-      const response = await fetch(`http://localhost:5000/api/callback?code=${code}`);
-      const { access_token } = await response.json();
 
-      if (access_token) {
-        setIsAuthenticated(true);
-        setToken(access_token)
-        localStorage.setItem('token', access_token);
-      } else {
-        console.error('Failed to exchange code for token:', access_token);
-        setLoading(false)
-      }
-    } catch (error) {
-      console.error('Error exchanging code for token:', error);
-      setLoading(false)
+  const exchangeCodeForToken = (code) => {
+    if (code) {
+      setLoading(true);
+      API.get(`${CALLBACK_ENDPOINTS.get}?code=${code}`)
+        .then((response) => {
+          const { access_token } = response.data;
+          if (access_token) {
+            setIsAuthenticated(true);
+            setToken(access_token);
+            localStorage.setItem('token', access_token);
+          } else {
+            console.error('Failed to exchange code for token:', access_token);
+          }
+        })
+        .catch((error) => {
+          console.error('Error exchanging code for token:', error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
   };
+
+
+
+
+
+  // const exchangeCodeForToken = async (code) => {
+  //   try {
+  //     setLoading(true)
+  //     const response = await fetch(`http://localhost:5000/api/callback?code=${code}`);
+  //     const { access_token } = await response.json();
+
+  //     if (access_token) {
+  //       setIsAuthenticated(true);
+  //       setToken(access_token)
+  //       localStorage.setItem('token', access_token);
+  //     } else {
+  //       console.error('Failed to exchange code for token:', access_token);
+  //       setLoading(false)
+  //     }
+  //   } catch (error) {
+  //     console.error('Error exchanging code for token:', error);
+  //     setLoading(false)
+  //   }
+  // };
+
+
+
+
+
 
   const LoadingScreen = () => {
     return (
