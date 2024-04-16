@@ -9,13 +9,8 @@ export const API = axios.create({
 });
 
 
-export const USER_ENDPOINTS = {
-    get: "users/",
-    numUserTypes: "users/num-user-types",
-    update: "/users/",
-    delete: "/users/",
-    add: "/users/add",
-    branchUsers: "/users/branch-users",
+export const CALLBACK_ENDPOINTS = {
+   
 };
 
 

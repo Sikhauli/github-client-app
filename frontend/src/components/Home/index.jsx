@@ -124,7 +124,7 @@ function index({ token, setLoading }) {
                 </div>
                 <div className='flex justify-between my-6 px-4'>
                       <div className='gap-4'>
-                        <p className='flex gap-2 capitalize '><TiPinOutline className='mt-1'/> pinned repositories</p>
+                        <p className='flex gap-2 capitalize '><TiPinOutline className='mt-1'/>Your repositories</p>
                           {selectedRepo && (
                               <div className='flex cursor-pointer'>
                                   <IoMdArrowRoundBack size={32} onClick={() => handleRepoSelection(null)} />
