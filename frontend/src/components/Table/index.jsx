@@ -123,7 +123,7 @@ export default function App({ repoData, token, setLoading }) {
 
                 // Fetch commits from server if repoData 
                 if (repoData) {
-                    const serverResponse = await axios.get('${API_URL}commits/all', {
+                    const serverResponse = await axios.get(`${API_URL}commits/all`, {
                         params: {
                             name: repoData?.name
                         }
