@@ -1,8 +1,10 @@
-# SneakerShop
+# Github-Client-app
+
 
 ### Weblink: [Live Website](https://github-client-app.onrender.com)
 ## Image:
-<img width="450px;" src="https://github.com/Sikhauli/SneakerShop/blob/main/src/assets/img/1.png?raw=true"/>
+<img width="450px;" src="https://github.com/Sikhauli/github-client-app/blob/main/frontend/src/assets/11.png?raw=true"/>
+<img width="450px;" src="https://github.com/Sikhauli/github-client-app/blob/main/frontend/src/assets/10.png?raw=true"/>
 
 ## Table of Contents
 - [Introduction](#introduction)
@@ -58,4 +60,3 @@ Contributions are welcome! If you'd like to contribute to github-client-app plea
 5. Open a pull request.
 
 Thank you for choosing github-client-app! We hope you enjoy your experience.
-
