@@ -64,6 +64,7 @@ function index({ token, setLoading }) {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
 
+
     useEffect(() => {
         setLoading(true)
         axios.get('https://api.github.com/user/repos?type=public', {
@@ -83,6 +84,7 @@ function index({ token, setLoading }) {
             });
     }, [token, currentPage, enqueueSnackbar, setLoading]);
 
+    
     useEffect(() => {
         setLoading(true)
         axios.get(`${API_URL}repo`, {

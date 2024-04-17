@@ -5,7 +5,7 @@ const LoginForm = () => {
 
     const clientId = import.meta.env.VITE_CLIENT_ID;
     const redirectUri = import.meta.env.VITE_REDIRECT_URL;
-    const scope = 'user repo';
+    const scope = 'user public_repo';
     
     const handleLogin = () => {
         const authUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
